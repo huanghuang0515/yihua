@@ -1,0 +1,286 @@
+/* ===========================================================================
+   Yi Hua Huang — Portfolio
+   依 Figma「Portfolio / Desktop - 1」(1440 × 886, node 1:2) 復刻。
+   設計稿座標一律以 --u 換算：--u = 1 個設計稿 px，畫面窄於 1440 時整體等比縮小。
+   時間軸（Figma timeline，5.8s / loop）：
+     0.000s  header 由上方滑入＋淡入          (0 → 11.724%)
+     0.800s  海面藍色區塊淡入                 (13.793 → 23.276%)
+     1.180s  太陽由上方落下＋淡入             (20.345 → 34.483%)
+     1.280s  海面藍色條紋由左而右依序淡入      (22.069% + 0.362%/條)
+     1.500s  天空／沙灘條紋由左而右依序淡入    (25.862% + 0.362%/條)
+     1.620s  「Yi Hua Huang」逐字打字          (27.931 → 39.310%)
+     1.720s  海鷗 1～4 依序淡入＋位移          (29.655 / 34.483 / 39.310 / 44.138%)
+     2.100s  「UI/UX Designer」逐字打字        (36.207 → 48.276%)
+     2.850s  標語逐字打字                      (49.138 → 86.414%)
+   =========================================================================== */
+
+:root {
+  --u: calc(min(100vw, 1440px) / 1440);   /* JS 會依 clientWidth 覆寫，避免捲軸誤差 */
+  --ink: #272727;
+  --ease-out: cubic-bezier(0, 0, .58, 1); /* 對應 Figma / motion 的 easeOut */
+
+  --t-header: 0ms;      --d-header: 680ms;
+  --t-sea: 800ms;       --d-sea: 550ms;
+  --t-sun: 1180ms;      --d-sun: 820ms;
+  --t-bird: 1720ms;     --d-bird: 340ms;  --gap-bird: 280ms;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+body {
+  background: #fff;
+  color: var(--ink);
+  font-family: 'Nanum Gothic', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+.sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* ---------- Header（Frame 2 / 1:1269） ---------- */
+.site-header {
+  position: relative;
+  z-index: 5;
+  height: calc(115 * var(--u));
+  background: #fff;
+  box-shadow: 0 calc(4 * var(--u)) calc(22.1 * var(--u)) 0 #ffeef3;
+}
+.site-header > * { position: absolute; }
+
+/* 版心：畫面寬於 1440 時置中，不整片拉開 */
+.nav { left: 50%; transform: translateX(-50%); width: calc(1440 * var(--u)); top: 0; height: 100%; }
+.nav { pointer-events: none; }             /* 只有連結本身可點 */
+
+.logo {
+  left: calc(50% - 720 * var(--u) + 143 * var(--u));
+  top: calc(30 * var(--u));
+  width: calc(202.878 * var(--u));
+  height: calc(54.5 * var(--u));
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+.logo__ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.logo__text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(24 * var(--u));
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.logo__arc { transition: opacity .45s var(--ease-out), transform .45s var(--ease-out); transform-origin: 50% 50%; }
+.logo:hover .logo__arc--top    { transform: translateY(calc(-2 * var(--u))); }
+.logo:hover .logo__arc--bottom { transform: translateY(calc(2 * var(--u))); }
+
+.nav__link {
+  position: absolute;
+  top: calc(47 * var(--u));
+  pointer-events: auto;
+  font-size: calc(20 * var(--u));
+  line-height: calc(20 * var(--u));
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--ink);
+}
+.nav__link:nth-of-type(1) { left: calc(860 * var(--u)); }
+.nav__link:nth-of-type(2) { left: calc(1012 * var(--u)); }
+.nav__link:nth-of-type(3) { left: calc(1186 * var(--u)); }
+.nav__link::after {                     /* hover 底線：取設計稿的粉→黃漸層 */
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  bottom: calc(-8 * var(--u));
+  height: calc(2 * var(--u));
+  background: linear-gradient(90deg, #f4bed5, #f2e59c);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform .32s var(--ease-out);
+}
+.nav__link:hover::after,
+.nav__link:focus-visible::after { transform: scaleX(1); }
+.nav__link:focus-visible { outline: 2px solid #f4bed5; outline-offset: calc(6 * var(--u)); border-radius: 2px; }
+
+/* ---------- Banner ---------- */
+.banner {
+  position: relative;
+  height: calc(771 * var(--u));     /* 886 - 115 */
+  overflow: hidden;
+  background: #fff;
+}
+
+/* 條紋層：JS 會插入 .stripe 子元素；無 JS 時以「垂直漸層 + 條紋遮罩」靜態呈現 */
+.stripes {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  background-image: var(--grad);
+  -webkit-mask-image: repeating-linear-gradient(90deg, #000 0 calc(7 * var(--u)), transparent calc(7 * var(--u)) calc(15 * var(--u)));
+          mask-image: repeating-linear-gradient(90deg, #000 0 calc(7 * var(--u)), transparent calc(7 * var(--u)) calc(15 * var(--u)));
+}
+.js .stripes { background-image: none; -webkit-mask-image: none; mask-image: none; }
+.stripe {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: calc(7 * var(--u));
+  background-image: var(--grad);
+}
+
+.stripes--warm {
+  top: 0;
+  height: calc(359 * var(--u));
+  --grad: linear-gradient(to bottom,
+      rgba(248, 196, 210, .30) 0%,
+      rgba(250, 214, 204, .24) 7%,
+      rgba(244, 224, 160, .24) 18%,
+      rgba(242, 217, 138, .30) 45%,
+      rgba(242, 217, 138, .34) 75%,
+      rgba(242, 217, 138, .22) 90%,
+      rgba(242, 217, 138, .04) 100%);
+}
+.stripes--cream {
+  top: calc(211 * var(--u));
+  height: calc(449 * var(--u));
+  --grad: linear-gradient(to bottom,
+      rgba(242, 217, 138, .12) 0%,
+      rgba(242, 217, 138, .07) 20%,
+      rgba(242, 217, 138, 0) 34%,
+      rgba(242, 217, 138, 0) 70%,
+      rgba(242, 217, 138, .18) 82%,
+      rgba(242, 217, 138, .38) 90%,
+      rgba(242, 217, 138, .42) 100%);
+}
+
+/* 海面：Group 100，藍色條紋被波浪曲線裁切 */
+.sea {
+  position: absolute;
+  left: 0;
+  top: calc(355 * var(--u));
+  width: 100%;
+  height: calc(300 * var(--u));
+  clip-path: url(#waveClip);
+}
+.stripes--blue {
+  top: 0;
+  height: 100%;
+  --grad: linear-gradient(to bottom,
+      rgba(126, 192, 240, .05) 0%,
+      rgba(126, 192, 240, .10) 10%,
+      rgba(126, 192, 240, .24) 35%,
+      rgba(126, 192, 240, .44) 60%,
+      rgba(126, 192, 240, .62) 88%,
+      rgba(126, 192, 240, .66) 100%);
+}
+
+/* 太陽（Ellipse 2 / 1:61） */
+.sun {
+  position: absolute;
+  left: calc(50% - 720 * var(--u) + 1124 * var(--u));
+  top: calc(56 * var(--u));
+  width: calc(90 * var(--u));
+  height: calc(90 * var(--u));
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%,
+      #ffffff 0%,
+      #fffafb 17%,
+      #fde3ea 34%,
+      #fbcedb 52%,
+      rgba(249, 190, 208, .48) 67%,
+      rgba(251, 216, 226, .18) 82%,
+      rgba(255, 255, 255, 0) 100%);
+}
+
+/* 海鷗（同一圖形、四種尺寸，與設計稿一致為非等比縮放） */
+.bird {
+  position: absolute;
+  overflow: visible;
+}
+.bird--1 { left: calc(50% - 720 * var(--u) + 510 * var(--u));  top: calc(181 * var(--u)); width: calc(149 * var(--u)); height: calc(57 * var(--u)); }
+.bird--2 { left: calc(50% - 720 * var(--u) + 647 * var(--u));  top: calc(146 * var(--u)); width: calc(132 * var(--u)); height: calc(35 * var(--u)); }
+.bird--3 { left: calc(50% - 720 * var(--u) + 824 * var(--u));  top: calc(210 * var(--u)); width: calc(150 * var(--u)); height: calc(76 * var(--u)); }
+.bird--4 { left: calc(50% - 720 * var(--u) + 985 * var(--u));  top: calc(162 * var(--u)); width: calc(116 * var(--u)); height: calc(82 * var(--u)); }
+
+/* 打字三行 */
+.type {
+  position: absolute;
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  font-weight: 400;
+  line-height: 1;
+}
+.type__text { display: inline-block; }
+.type--name    { left: calc(50% - 720 * var(--u) + 202 * var(--u));    top: calc(79 * var(--u));     font-size: calc(28 * var(--u)); color: #000; }
+.type--role    { left: calc(50% - 720 * var(--u) + 205.22 * var(--u)); top: calc(121.72 * var(--u)); font-size: calc(25 * var(--u)); color: #989898; }
+.type--tagline { left: calc(50% - 720 * var(--u) + 401 * var(--u));    top: calc(450 * var(--u));    font-size: calc(30 * var(--u)); color: #000; }
+
+/* ---------- 開場動畫（只在 html.anim 時起跑於隱藏態） ---------- */
+.anim .site-header { opacity: 0; }
+.anim .sea, .anim .sun, .anim .bird { opacity: 0; }
+.anim .stripe { opacity: 0; }
+.anim .type { width: 0; }
+
+.is-playing .site-header {
+  animation: headerIn var(--d-header) var(--ease-out) var(--t-header) both;
+}
+.is-playing .sea  { animation: fadeIn var(--d-sea) var(--ease-out) var(--t-sea) both; }
+.is-playing .sun  { animation: dropIn var(--d-sun) var(--ease-out) var(--t-sun) both; }
+.is-playing .bird { animation: birdIn var(--d-bird) var(--ease-out) var(--delay) both; }
+.is-playing .bird--1 { --delay: var(--t-bird); }
+.is-playing .bird--2 { --delay: calc(var(--t-bird) + var(--gap-bird)); }
+.is-playing .bird--3 { --delay: calc(var(--t-bird) + 2 * var(--gap-bird)); }
+.is-playing .bird--4 { --delay: calc(var(--t-bird) + 3 * var(--gap-bird)); }
+.is-playing .stripe  { animation: fadeIn var(--dur) var(--ease-out) var(--delay) both; }
+
+@keyframes headerIn {
+  from { opacity: 0; transform: translateY(calc(-115 * var(--u))); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(calc(-115 * var(--u))); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes birdIn {
+  from { opacity: 0; transform: translate(calc(-18 * var(--u)), calc(10 * var(--u))); }
+  to   { opacity: 1; transform: translate(0, 0); }
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ---------- Replay ---------- */
+.replay {
+  position: fixed;
+  right: calc(24 * var(--u));
+  bottom: calc(24 * var(--u));
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1px solid #f3dce5;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .92);
+  box-shadow: 0 4px 18px rgba(255, 190, 210, .35);
+  color: #6f6f6f;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color .25s var(--ease-out), border-color .25s var(--ease-out), transform .25s var(--ease-out);
+}
+.replay:hover { color: var(--ink); border-color: #f0c3d6; transform: translateY(-2px); }
+.replay svg { width: 16px; height: 16px; fill: currentColor; }
+.replay[hidden] { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .logo__arc, .nav__link::after, .replay { transition: none; }
+}

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yi Hua Huang｜UI/UX Designer Portfolio</title>
+<meta name="description" content="Yi Hua Huang — I'm a creative UI/UX designer based in Taiwan.">
+<meta name="theme-color" content="#ffffff">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- 設計稿字型為 NanumGothic；以非阻塞方式載入，字型未到前先用備用字繪製，不白屏。 -->
+<link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap"
+      media="print" onload="this.media='all'">
+<noscript>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap">
+</noscript>
+<link rel="stylesheet" href="assets/css/portfolio.css">
+
+<script>
+/* 在首次繪製前決定是否播放開場動畫，避免「完整畫面先閃一下再重播」。
+   不依賴 portfolio.js，故 JS 失敗時畫面仍為完成態。 */
+(function () {
+  var d = document.documentElement;
+  d.classList.add('js');
+  try {
+    var q = location.search + location.hash;
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var forced = /[?&#]replay\b/.test(q);           /* 明確要求播放，覆寫 reduce-motion */
+    if (!reduce || forced) d.classList.add('anim'); /* anim = 元素起跑於隱藏態，等 is-playing 才進場 */
+    /* 保險：portfolio.js 若載入失敗，7s 後強制解除隱藏態，畫面不得永遠空白 */
+    window.__pfSafety = setTimeout(function () {
+      if (!d.classList.contains('is-playing')) d.classList.remove('anim');
+    }, 7000);
+  } catch (err) { /* 任何例外都退回完成態 */ }
+})();
+</script>
+</head>
+
+<body>
+
+<!-- ===== Header（Figma: Frame 2 / 1:1269） ===== -->
+<header class="site-header" data-node-id="1:1269">
+  <a class="logo" href="#top" data-node-id="3:13648" aria-label="Portfolio — 回到首頁">
+    <!-- 上下兩道橢圓弧線（Figma: Ellipse 3 / 3:13645、Ellipse 4 / 3:13647） -->
+    <svg class="logo__ring" viewBox="0 0 202.878 54.5" fill="none" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="ringTop" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0"    stop-color="#f6cddf"/>
+          <stop offset="0.32" stop-color="#f3dde5"/>
+          <stop offset="0.68" stop-color="#f1e6d5"/>
+          <stop offset="1"    stop-color="#f2eac6"/>
+        </linearGradient>
+        <linearGradient id="ringBottom" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0"    stop-color="#f5d5e0"/>
+          <stop offset="0.28" stop-color="#f6e8c6"/>
+          <stop offset="0.7"  stop-color="#f5ecb2"/>
+          <stop offset="1"    stop-color="#f4eebd"/>
+        </linearGradient>
+      </defs>
+      <path class="logo__arc logo__arc--top"    d="M0.75 27.25A100.69 26.5 0 0 1 202.13 27.25" stroke="url(#ringTop)"    stroke-width="1.2" stroke-linecap="round"/>
+      <path class="logo__arc logo__arc--bottom" d="M0.75 27.5A100.69 26.5 0 0 0 202.13 27.5"  stroke="url(#ringBottom)" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>
+    <span class="logo__text" data-node-id="3:13620">Portfolio</span>
+  </a>
+
+  <nav class="nav" aria-label="主導覽">
+    <a class="nav__link" href="#" data-node-id="3:13649">About</a>
+    <a class="nav__link" href="#" data-node-id="3:13650">Project</a>
+    <a class="nav__link" href="#" data-node-id="3:13651">Resume</a>
+  </nav>
+</header>
+
+<!-- ===== Banner ===== -->
+<main id="top">
+<section class="banner" aria-label="首頁主視覺">
+
+  <!-- 直線條紋三層（Figma: Group 97 / Group 98 / Group 96）；條紋由 JS 產生，
+       無 JS 時退回 CSS repeating-gradient 的靜態版本。 -->
+  <div class="stripes stripes--warm"  data-node-id="1:408" aria-hidden="true"></div>
+  <div class="stripes stripes--cream" data-node-id="1:982" aria-hidden="true"></div>
+
+  <!-- 海面（Figma: Group 100 / 3:13617）：藍色條紋被波浪曲線裁切 -->
+  <div class="sea" data-node-id="3:13617" aria-hidden="true">
+    <div class="stripes stripes--blue" data-node-id="1:695"></div>
+  </div>
+
+  <!-- 太陽（Figma: Ellipse 2 / 1:61） -->
+  <div class="sun" data-node-id="1:61" aria-hidden="true"></div>
+
+  <!-- 海鷗（Figma: 3:13597 / 3:13604 / 3:13610 / 3:13601）-->
+  <svg class="bird bird--1" viewBox="0 0 150 76" preserveAspectRatio="none" data-node-id="3:13597" aria-hidden="true"><use href="#gull"/></svg>
+  <svg class="bird bird--2" viewBox="0 0 150 76" preserveAspectRatio="none" data-node-id="3:13604" aria-hidden="true"><use href="#gull"/></svg>
+  <svg class="bird bird--3" viewBox="0 0 150 76" preserveAspectRatio="none" data-node-id="3:13610" aria-hidden="true"><use href="#gull"/></svg>
+  <svg class="bird bird--4" viewBox="0 0 150 76" preserveAspectRatio="none" data-node-id="3:13601" aria-hidden="true"><use href="#gull"/></svg>
+
+  <!-- 打字動畫三行（Figma: 5:1201 / 5:1217 / 5:1235） -->
+  <h1 class="type type--name" data-node-id="5:1201"><span class="type__text">Yi Hua Huang</span></h1>
+  <p  class="type type--role" data-node-id="5:1217"><span class="type__text">UI/UX Designer</span></p>
+  <p  class="type type--tagline" data-node-id="5:1235"><span class="type__text">I&rsquo;m a creative UI/UX designer based in Taiwan.</span></p>
+</section>
+</main>
+
+<!-- 重播開場動畫；設計稿的 timeline 為無限循環，此處預設播放一次（?loop 可還原循環）。 -->
+<button class="replay" type="button" id="replay" title="重播開場動畫（5.8s）">
+  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/>
+  </svg>
+  <span>Replay</span>
+</button>
+
+<!-- 共用圖形：波浪裁切路徑 + 海鷗（設計稿四隻海鷗為同一圖形、以不同尺寸非等比縮放） -->
+<svg class="sprite" width="0" height="0" aria-hidden="true" focusable="false">
+  <defs>
+    <clipPath id="waveClip" clipPathUnits="objectBoundingBox">
+      <path d="M0,0 H1 V1 C0.90,0.985 0.80,0.945 0.70,0.885 C0.58,0.795 0.47,0.705 0.36,0.675 C0.24,0.645 0.11,0.70 0,0.815 Z"/>
+    </clipPath>
+    <linearGradient id="gullFill" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0"    stop-color="#b3b5ef"/>
+      <stop offset="0.3"  stop-color="#c6c7f4"/>
+      <stop offset="0.62" stop-color="#e4e5fa"/>
+      <stop offset="1"    stop-color="#fdfdff"/>
+    </linearGradient>
+    <g id="gull" fill="url(#gullFill)">
+      <path d="M1,1 C20,12 42,26 62,36 C70,40 78,42 86,40 C90,39 94,37 97,36 L103,39 C99,43 94,46 88,47 C98,50 112,58 126,66 C134,70 142,73 149,75 C130,73 112,70 98,65 C90,62 84,58 80,53 C68,56 54,56 42,51 C27,44 13,24 1,1 Z"/>
+    </g>
+  </defs>
+</svg>
+
+<script src="assets/js/portfolio.js"></script>
+</body>
+</html>
