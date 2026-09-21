@@ -1,9 +1,8 @@
 // 本機預覽用的極簡靜態檔案伺服器（開發輔助，非網站的一部分）。
-// 以「這支檔案所在的資料夾」為網站根目錄，因此整個 portfolio/ 資料夾
-// 可以搬到任何位置（例如 D:\Michelle\Portfolio）直接使用。
+// 以「這支檔案所在的資料夾」為網站根目錄，因此整包資料夾搬到任何位置都能直接使用。
 //
 //   node serve.js              → http://localhost:4173/
-//   PORT=5173 node serve.js    → 換埠號（Windows PowerShell：$env:PORT=5173; node serve.js）
+//   PORT=5173 node serve.js    → 換埠號（PowerShell：$env:PORT=5173; node serve.js）
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
