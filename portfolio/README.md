@@ -14,7 +14,9 @@
 **最快：直接開檔案。** 用瀏覽器開啟 `index.html` 即可（點兩下）。
 `file://` 下所有素材都會正常載入，只有 Google Fonts 需要連線（離線時會退到備用字型）。
 
-**要用伺服器：**
+**要用伺服器：** Windows 直接點兩下 `start.bat`，會自動起在
+<http://localhost:5500/> 並開啟瀏覽器（沒裝 Node 會自動改用 Python）。
+其他系統或想自己下指令：
 
 ```bash
 node serve.js        # 或 npm start
@@ -40,6 +42,7 @@ node serve.js        # 或 npm start
 ```
 index.html                   版面結構（每個區塊都標了對應的 Figma node id）
 serve.js                     本機預覽伺服器（開發輔助，非網站的一部分）
+start.bat                    Windows 一鍵啟動：點兩下即開 localhost:5500
 package.json                 只有 start 指令，無相依套件
 assets/css/portfolio.css     版面與動態；時間常數集中在檔頭註解
 assets/js/portfolio.js       條紋產生、逐字打字、播放控制
