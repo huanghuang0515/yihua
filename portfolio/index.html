@@ -40,67 +40,55 @@
 
 <body>
 
-<!-- ===== Header（Figma: Frame 2 / 1:1269） ===== -->
-<header class="site-header" data-node-id="1:1269">
-  <a class="logo" href="#top" data-node-id="3:13648" aria-label="Portfolio — 回到首頁">
-    <!-- 上下兩道橢圓弧線（Figma: Ellipse 3 / 3:13645、Ellipse 4 / 3:13647） -->
-    <svg class="logo__ring" viewBox="0 0 202.878 54.5" fill="none" aria-hidden="true" focusable="false">
-      <defs>
-        <linearGradient id="ringTop" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0"    stop-color="#f6cddf"/>
-          <stop offset="0.32" stop-color="#f3dde5"/>
-          <stop offset="0.68" stop-color="#f1e6d5"/>
-          <stop offset="1"    stop-color="#f2eac6"/>
-        </linearGradient>
-        <linearGradient id="ringBottom" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0"    stop-color="#f5d5e0"/>
-          <stop offset="0.28" stop-color="#f6e8c6"/>
-          <stop offset="0.7"  stop-color="#f5ecb2"/>
-          <stop offset="1"    stop-color="#f4eebd"/>
-        </linearGradient>
-      </defs>
-      <path class="logo__arc logo__arc--top"    d="M0.75 27.25A100.69 26.5 0 0 1 202.13 27.25" stroke="url(#ringTop)"    stroke-width="1.2" stroke-linecap="round"/>
-      <path class="logo__arc logo__arc--bottom" d="M0.75 27.5A100.69 26.5 0 0 0 202.13 27.5"  stroke="url(#ringBottom)" stroke-width="1.2" stroke-linecap="round"/>
-    </svg>
-    <span class="logo__text" data-node-id="3:13620">Portfolio</span>
-  </a>
+<!-- ===========================================================================
+     stage = Figma frame「Desktop - 1」(1:2, 1440 × 886)
+     子層順序與設計稿的 z-order 完全一致：
+       z0 Frame 1 / Group 97   米色條紋（畫面下半）
+       z1 Group 98             近白條紋（畫面上半）
+       z2 Group 100            海面：藍色波浪色塊 + 白色條紋（以波浪形狀遮罩）
+       z3 Frame 2              header
+       z4 Ellipse 2            太陽
+       z5–z8 Vector ×4         海鷗
+       z9–z11 Typing ×3        三行文字
+     =========================================================================== -->
+<div class="stage" id="top">
 
-  <nav class="nav" aria-label="主導覽">
-    <a class="nav__link" href="#" data-node-id="3:13649">About</a>
-    <a class="nav__link" href="#" data-node-id="3:13650">Project</a>
-    <a class="nav__link" href="#" data-node-id="3:13651">Resume</a>
-  </nav>
-</header>
+  <div class="stripes stripes--a" data-node-id="1:408" aria-hidden="true"></div>
+  <div class="stripes stripes--b" data-node-id="1:982" aria-hidden="true"></div>
 
-<!-- ===== Banner ===== -->
-<main id="top">
-<section class="banner" aria-label="首頁主視覺">
-
-  <!-- 直線條紋三層（Figma: Group 97 / Group 98 / Group 96）；條紋由 JS 產生，
-       無 JS 時退回 CSS repeating-gradient 的靜態版本。 -->
-  <div class="stripes stripes--warm"  data-node-id="1:408" aria-hidden="true"></div>
-  <div class="stripes stripes--cream" data-node-id="1:982" aria-hidden="true"></div>
-
-  <!-- 海面（Figma: Group 100 / 3:13617）：藍色條紋被波浪曲線裁切 -->
   <div class="sea" data-node-id="3:13617" aria-hidden="true">
-    <div class="stripes stripes--blue" data-node-id="1:695"></div>
+    <img class="sea__shape" src="assets/img/sea.svg" alt="" data-node-id="1:3">
+    <div class="stripes stripes--c" data-node-id="1:695"></div>
   </div>
 
-  <!-- 太陽（Figma: Ellipse 2 / 1:61） -->
-  <div class="sun" data-node-id="1:61" aria-hidden="true"></div>
+  <!-- Header（Figma: Frame 2 / 1:1269） -->
+  <header class="site-header" data-node-id="1:1269">
+    <a class="logo" href="#top" data-node-id="3:13648" aria-label="Portfolio — 回到首頁">
+      <img class="logo__arc logo__arc--top"    src="assets/img/logo-arc-top.svg"    alt="" width="203" height="30" data-node-id="3:13645">
+      <img class="logo__arc logo__arc--bottom" src="assets/img/logo-arc-bottom.svg" alt="" width="203" height="30" data-node-id="3:13647">
+      <span class="logo__text" data-node-id="3:13620">Portfolio</span>
+    </a>
 
-  <!-- 海鷗：設計稿匯出的原始 SVG（Figma: 3:13597 / 3:13604 / 3:13610 / 3:13601）-->
-  <img class="bird bird--1" src="assets/img/bird-1.svg" width="149" height="57" alt="" data-node-id="3:13597" aria-hidden="true">
-  <img class="bird bird--2" src="assets/img/bird-2.svg" width="132" height="35" alt="" data-node-id="3:13604" aria-hidden="true">
-  <img class="bird bird--3" src="assets/img/bird-3.svg" width="150" height="76" alt="" data-node-id="3:13610" aria-hidden="true">
-  <img class="bird bird--4" src="assets/img/bird-4.svg" width="116" height="82" alt="" data-node-id="3:13601" aria-hidden="true">
+    <nav class="nav" aria-label="主導覽">
+      <a class="nav__link" href="#" data-node-id="3:13649">About</a>
+      <a class="nav__link" href="#" data-node-id="3:13650">Project</a>
+      <a class="nav__link" href="#" data-node-id="3:13651">Resume</a>
+    </nav>
+  </header>
 
-  <!-- 打字動畫三行（Figma: 5:1201 / 5:1217 / 5:1235） -->
-  <h1 class="type type--name" data-node-id="5:1201"><span class="type__text">Yi Hua Huang</span></h1>
-  <p  class="type type--role" data-node-id="5:1217"><span class="type__text">UI/UX Designer</span></p>
-  <p  class="type type--tagline" data-node-id="5:1235"><span class="type__text">I&rsquo;m a creative UI/UX designer based in Taiwan.</span></p>
-</section>
-</main>
+  <main class="banner" aria-label="首頁主視覺">
+    <img class="sun" src="assets/img/sun.svg" alt="" width="90" height="90" data-node-id="1:61" aria-hidden="true">
+
+    <img class="bird bird--1" src="assets/img/bird-1.svg" width="149" height="57" alt="" data-node-id="3:13597" aria-hidden="true">
+    <img class="bird bird--2" src="assets/img/bird-2.svg" width="132" height="35" alt="" data-node-id="3:13604" aria-hidden="true">
+    <img class="bird bird--3" src="assets/img/bird-3.svg" width="150" height="76" alt="" data-node-id="3:13610" aria-hidden="true">
+    <img class="bird bird--4" src="assets/img/bird-4.svg" width="116" height="82" alt="" data-node-id="3:13601" aria-hidden="true">
+
+    <h1 class="type type--name" data-node-id="5:1201"><span class="type__text">Yi Hua Huang</span></h1>
+    <p  class="type type--role" data-node-id="5:1217"><span class="type__text">UI/UX Designer</span></p>
+    <p  class="type type--tagline" data-node-id="5:1235"><span class="type__text">I&rsquo;m a creative UI/UX designer based in Taiwan.</span></p>
+  </main>
+</div>
 
 <!-- 重播開場動畫；設計稿的 timeline 為無限循環，此處預設播放一次（?loop 可還原循環）。 -->
 <button class="replay" type="button" id="replay" title="重播開場動畫（5.8s）">
@@ -109,15 +97,6 @@
   </svg>
   <span>Replay</span>
 </button>
-
-<!-- 海面的波浪裁切路徑 -->
-<svg class="sprite" width="0" height="0" aria-hidden="true" focusable="false">
-  <defs>
-    <clipPath id="waveClip" clipPathUnits="objectBoundingBox">
-      <path d="M0,0 H1 V1 C0.90,0.985 0.80,0.945 0.70,0.885 C0.58,0.795 0.47,0.705 0.36,0.675 C0.24,0.645 0.11,0.70 0,0.815 Z"/>
-    </clipPath>
-  </defs>
-</svg>
 
 <script src="assets/js/portfolio.js"></script>
 </body>

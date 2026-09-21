@@ -14,9 +14,9 @@
 
   var T = {
     stripes: {
-      warm:  { start: at(25.862), span: at(34.035), dur: at(3.104) },  /* Group 97 */
-      cream: { start: at(25.862), span: at(34.035), dur: at(3.104) },  /* Group 98 */
-      blue:  { start: at(22.069), span: at(34.034), dur: at(2.759) }   /* Group 96 */
+      a: { start: at(25.862), span: at(34.035), dur: at(3.104) },   /* Group 97 米色 */
+      b: { start: at(25.862), span: at(34.035), dur: at(3.104) },   /* Group 98 近白 */
+      c: { start: at(22.069), span: at(34.034), dur: at(2.759) }    /* Group 96 白色 */
     },
     typing: {
       name:    { start: at(27.931), step: at(0.948) },   /* 5:1201 */
@@ -32,34 +32,42 @@
     return Math.min(1, w / 1440);
   }
 
-  /* ---- 2 條紋：每層 95 條（依畫面寬度補滿），由左而右依序淡入 ---- */
+  /* ---- 2 條紋：設計稿每層 95 條，間距 15px；畫面寬於 1440 時往兩側續接 ---- */
+  var LAST = 94;                              /* 設計稿條紋索引 0…94 */
   var LAYERS = [
-    { sel: '.stripes--warm',  key: 'warm' },
-    { sel: '.stripes--cream', key: 'cream' },
-    { sel: '.stripes--blue',  key: 'blue' }
+    { sel: '.stripes--a', key: 'a', x0: 10 }, /* ink 起點：10 + 15k */
+    { sel: '.stripes--b', key: 'b', x0: 10 },
+    { sel: '.stripes--c', key: 'c', x0: 9 }   /* 海面那層左移 1px，與設計稿一致 */
   ];
 
   function buildStripes() {
     var u = setUnit();
-    var pitch = 15 * u;
-    var width = root.clientWidth || window.innerWidth;
-    var count = Math.ceil(width / pitch) + 1;
+    var vw = root.clientWidth || window.innerWidth;
+    var stageLeft = Math.max(0, (vw - 1440 * u) / 2);   /* 版心置中後左側留白 */
 
     LAYERS.forEach(function (layer) {
       var host = document.querySelector(layer.sel);
       if (!host) return;
-      if (host.childElementCount === count) return;     /* 寬度沒變就不重建 */
+
+      var kMin = 0, kMax = LAST;
+      if (stageLeft > 0) {                    /* 畫面比設計稿寬：沿用間距往外補 */
+        kMin = Math.min(0, Math.floor((-stageLeft - layer.x0 * u) / (15 * u)));
+        kMax = Math.max(LAST, Math.ceil((vw - stageLeft - layer.x0 * u) / (15 * u)));
+      }
+      var range = kMin + ':' + kMax;
+      if (host.dataset.range === range) return;         /* 範圍沒變就不重建 */
+      host.dataset.range = range;
+
       var t = T.stripes[layer.key];
       var frag = document.createDocumentFragment();
       host.textContent = '';
-      for (var i = 0; i < count; i++) {
+      for (var k = kMin; k <= kMax; k++) {
         var s = document.createElement('i');
         s.className = 'stripe';
-        s.style.setProperty('--i', i);
-        /* 掃描總時長固定：不論畫面多寬，左→右點亮的節奏都與設計稿一致 */
-        s.style.setProperty('--delay', (t.start + (count > 1 ? i / (count - 1) : 0) * t.span) + 'ms');
+        s.style.setProperty('--i', k);
+        /* 掃描節奏固定綁在設計稿的 95 條上，畫面再寬也與設計稿同速 */
+        s.style.setProperty('--delay', (t.start + (k / LAST) * t.span) + 'ms');
         s.style.setProperty('--dur', t.dur + 'ms');
-        s.style.left = 'calc(var(--i) * 15 * var(--u))';
         frag.appendChild(s);
       }
       host.appendChild(frag);
