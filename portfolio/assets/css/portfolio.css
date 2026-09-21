@@ -32,6 +32,11 @@
   /* 版心左緣：畫面寬於 1440 時置中，窄於 1440 時貼齊 0。
      50% 會在各使用點自行解析（其容器都是滿版），故放在 :root 即可。 */
   --origin: calc(50% - 720 * var(--u));
+
+  --pitch: 15;   /* 條紋間距（設計稿值） */
+  --sw: 8;       /* 單條條紋寬度（設計稿值） */
+  --stripes: design;  /* design：固定設計稿 95 條；fill：填滿容器（手機版） */
+  --layout: desktop;  /* JS 依此決定要不要覆寫 --u */
 }
 
 * { box-sizing: border-box; }
@@ -64,9 +69,9 @@ body {
 .stripe {
   position: absolute;
   top: 0;
-  width: calc(8 * var(--u));
+  width: calc(var(--sw) * var(--u));
   height: var(--h, 100%);
-  left: calc(var(--origin) + (var(--x0) + var(--i) * 15) * var(--u));
+  left: calc(var(--origin) + (var(--x0) + var(--i) * var(--pitch)) * var(--u));
   background-image: var(--src);
   background-size: 100% 100%;
   background-repeat: no-repeat;
@@ -97,11 +102,11 @@ body {
 
 /* 無 JS 時的近似退回版本（有 JS 時由 .stripe 元素取代） */
 .stripes--a, .stripes--b, .stripes--c { background-repeat: repeat-x; }
-.stripes--a { background-image: repeating-linear-gradient(90deg, #FEF7DA 0 calc(7 * var(--u)), transparent calc(7 * var(--u)) calc(15 * var(--u)));
+.stripes--a { background-image: repeating-linear-gradient(90deg, #FEF7DA 0 calc(var(--sw) * var(--u)), transparent calc(var(--sw) * var(--u)) calc(var(--pitch) * var(--u)));
               -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,.06), #000);
                       mask-image: linear-gradient(180deg, rgba(0,0,0,.06), #000); }
-.stripes--b { background-image: repeating-linear-gradient(90deg, #FFFCEE 0 calc(7 * var(--u)), transparent calc(7 * var(--u)) calc(15 * var(--u))); }
-.stripes--c { background-image: repeating-linear-gradient(90deg, #fff 0 calc(7 * var(--u)), transparent calc(7 * var(--u)) calc(15 * var(--u))); }
+.stripes--b { background-image: repeating-linear-gradient(90deg, #FFFCEE 0 calc(var(--sw) * var(--u)), transparent calc(var(--sw) * var(--u)) calc(var(--pitch) * var(--u))); }
+.stripes--c { background-image: repeating-linear-gradient(90deg, #fff 0 calc(var(--sw) * var(--u)), transparent calc(var(--sw) * var(--u)) calc(var(--pitch) * var(--u))); }
 .js .stripes--a, .js .stripes--b { background-image: none; }
 .js .stripes--a { -webkit-mask-image: none; mask-image: none; }
 .js .stripes--c { background-image: none; }
@@ -240,7 +245,7 @@ body {
 .anim .sun,
 .anim .bird,
 .anim .stripe { opacity: 0; }
-.anim .type { width: 0; }
+.anim .type .ch { visibility: hidden; }   /* 逐字浮現：JS 依時序逐字設為 visible */
 
 .is-playing .site-header { animation: headerIn var(--d-header) var(--ease-out) var(--t-header) both; }
 .is-playing .sea__shape  { animation: fadeIn var(--d-sea) var(--ease-out) var(--t-sea) both; }
@@ -292,4 +297,108 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .logo__arc, .nav__link::after, .replay { transition: none; }
+}
+
+
+/* 觸控裝置：以 padding + 負 margin 擴大點擊範圍，視覺位置不變 */
+@media (pointer: coarse) {
+  .nav__link { padding: 11px 8px; margin: -11px -8px; }
+}
+
+/* ===========================================================================
+   手機直式版面（≤767px 且為直式）
+   設計稿只有 1440 桌機版，這裡依它的元素、色彩與動態順序重新排版：
+     ‧ 改用實際像素排版（--u: 1px），文字維持可讀級距，不再整張等比縮小
+     ‧ 垂直位置改用 stage 高度百分比，適應各種手機長寬比
+     ‧ 條紋改為填滿容器、間距縮為 11px（維持設計稿 8:15 的寬度比例）
+     ‧ 海面波浪放大到 240% 後取中段，保留設計稿和緩的弧度而不是被壓成陡坡
+   =========================================================================== */
+@media (max-width: 767px) and (orientation: portrait) {
+  :root {
+    --u: 1px;          /* 手機版改用實際像素排版（JS 會讓出控制權） */
+    --layout: mobile;
+    --pitch: 11;
+    --sw: 5.9;
+    --stripes: fill;
+  }
+
+  .stage {
+    height: 100vh;                          /* 舊瀏覽器退回 vh */
+    height: 100dvh;                         /* 含網址列縮放的實際可視高度 */
+  }
+
+  /* ---- 背景三層 ---- */
+  .stripes--b { top: 0;   height: 60%; }
+  .stripes--a { top: 54%; height: 39%; }
+  .sea        { top: 57%; height: 31%; }
+  .sea__shape,
+  .stripes--c { left: -40%; right: auto; width: 240%; }
+  .stripes--c { --h: 100%; }              /* 白條紋填滿海面高度 */
+
+  /* ---- Header ---- */
+  .site-header { height: 64px; }
+  .logo {                                   /* 內部幾何沿用設計稿，整體縮放 */
+    left: 20px;
+    top: 13px;
+    transform: scale(.65);
+    transform-origin: left top;
+  }
+  .nav {
+    inset: 0 14px 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+  .nav__link {
+    position: static;
+    margin: 0;
+    padding: 12px 6px;                      /* 觸控高度 36px，左右各 6px 視覺間距 */
+    font-size: 12px;
+    line-height: 1;
+  }
+  .nav__link::after { bottom: 6px; }
+
+  /* ---- 太陽／海鷗 ---- */
+  .sun { left: auto; right: 22px; top: 92px; width: 78px; height: 78px; }
+
+  .bird { height: auto; }
+  .bird--1 { left: 3%;  top: 24%; width: 36vw; }
+  .bird--2 { left: 55%; top: 22%; width: 27vw; }
+  .bird--3 { left: 16%; top: 33%; width: 38vw; }
+  .bird--4 { left: 60%; top: 39%; width: 25vw; }
+
+  /* ---- 文字 ---- */
+  .type--name {
+    left: 24px; top: 104px;
+    font-size: 30px; line-height: 1.1;
+  }
+  .type--role {
+    left: 24px; top: 146px;
+    font-size: 20px; line-height: 1.1;
+  }
+  .type--tagline {                          /* 手機版允許換行，逐字浮現不受影響 */
+    left: 24px; right: 24px; top: 63%;
+    width: auto;
+    font-size: 20px; line-height: 1.45;
+    white-space: normal;
+    text-align: center;
+  }
+
+  /* ---- 重播鍵 ---- */
+  .replay { right: 16px; bottom: 16px; padding: 9px 14px; font-size: 13px; }
+}
+
+/* 更窄的機型（≤360px）：header 內的 logo 與導覽再收一階，避免互相重疊 */
+@media (max-width: 360px) and (orientation: portrait) {
+  .logo { left: 16px; transform: scale(.52); }
+  .nav { inset: 0 10px 0 auto; gap: 2px; }
+  .nav__link { padding: 12px 4px; font-size: 10.5px; }
+  .type--name { font-size: 26px; }
+  .type--role { font-size: 18px; }
+  .type--tagline { font-size: 18px; }
+  .sun { right: 16px; top: 84px; width: 66px; height: 66px; }
+  .type--name { top: 96px; left: 20px; }
+  .type--role { top: 134px; left: 20px; }
+  .type--tagline { left: 18px; right: 18px; }
 }

@@ -27,9 +27,15 @@
 
   /* ---- 1 設計稿單位：--u = 1 個設計稿 px（以 clientWidth 計，避開捲軸誤差） ---- */
   function setUnit() {
+    /* 手機版用實際像素排版，--u 由 CSS 給（1px），JS 不可覆寫，
+       否則行內樣式會蓋掉 media query，整個版面又縮回桌機比例。 */
+    if (cssVar('--layout', 'desktop') === 'mobile') {
+      root.style.removeProperty('--u');
+      return parseFloat(cssVar('--u', '1')) || 1;
+    }
     var w = root.clientWidth || window.innerWidth;
     var h = root.clientHeight || window.innerHeight;
-    /* 寬、高都納入：整張 1440x886 一定完整可見，不被裁切也不需捲動。
+    /* 桌機版：寬、高都納入，整張 1440x886 一定完整可見，不被裁切也不需捲動。
        條紋與海面仍以 100% 寬滿版延伸，只有版心內容隨 --u 置中。 */
     var u = Math.min(1, w / 1440, h / 886);
     root.style.setProperty('--u', u + 'px');
@@ -44,91 +50,110 @@
     { sel: '.stripes--c', key: 'c', x0: 9 }   /* 海面那層左移 1px，與設計稿一致 */
   ];
 
+  function cssVar(name, fallback) {
+    var v = getComputedStyle(root).getPropertyValue(name).trim();
+    return v === '' ? fallback : v;
+  }
+
   function buildStripes() {
     var u = setUnit();
-    var vw = root.clientWidth || window.innerWidth;
-    var stageLeft = Math.max(0, (vw - 1440 * u) / 2);   /* 版心置中後左側留白 */
+    var pitch = parseFloat(cssVar('--pitch', '15'));
+    var mode = cssVar('--stripes', 'design');   /* design：維持設計稿 95 條；fill：填滿容器 */
 
     LAYERS.forEach(function (layer) {
       var host = document.querySelector(layer.sel);
       if (!host) return;
 
+      var boxW = host.getBoundingClientRect().width;
+      /* 對應 CSS 的 left: calc(50% - 720*--u + (x0 + i*pitch)*--u) */
+      var first = boxW / 2 - 720 * u + layer.x0 * u;
+      var step = pitch * u;
+
       var kMin = 0, kMax = LAST;
-      if (stageLeft > 0) {                    /* 畫面比設計稿寬：沿用間距往外補 */
-        kMin = Math.min(0, Math.floor((-stageLeft - layer.x0 * u) / (15 * u)));
-        kMax = Math.max(LAST, Math.ceil((vw - stageLeft - layer.x0 * u) / (15 * u)));
+      if (mode === 'fill' || boxW > 1440 * u + 1) {
+        kMin = Math.floor((0 - first) / step);
+        kMax = Math.ceil((boxW - first) / step);
+        if (mode !== 'fill') {                  /* 桌機版：至少涵蓋設計稿的 95 條 */
+          kMin = Math.min(0, kMin);
+          kMax = Math.max(LAST, kMax);
+        }
       }
-      var range = kMin + ':' + kMax;
-      if (host.dataset.range === range) return;         /* 範圍沒變就不重建 */
+
+      var range = kMin + ':' + kMax + ':' + pitch;
+      if (host.dataset.range === range) return; /* 條件沒變就不重建 */
       host.dataset.range = range;
 
       var t = T.stripes[layer.key];
+      var span = Math.max(1, kMax - kMin);
       var frag = document.createDocumentFragment();
       host.textContent = '';
       for (var k = kMin; k <= kMax; k++) {
-        var s = document.createElement('i');
-        s.className = 'stripe';
-        s.style.setProperty('--i', k);
-        /* 掃描節奏固定綁在設計稿的 95 條上，畫面再寬也與設計稿同速 */
-        s.style.setProperty('--delay', (t.start + (k / LAST) * t.span) + 'ms');
-        s.style.setProperty('--dur', t.dur + 'ms');
-        frag.appendChild(s);
+        var el = document.createElement('i');
+        el.className = 'stripe';
+        el.style.setProperty('--i', k);
+        /* 由左而右的掃描總長固定：畫面多寬、條數多少，節奏都與設計稿一致 */
+        el.style.setProperty('--delay', (t.start + ((k - kMin) / span) * t.span) + 'ms');
+        el.style.setProperty('--dur', t.dur + 'ms');
+        frag.appendChild(el);
       }
       host.appendChild(frag);
     });
   }
 
-  /* ---- 3 逐字打字：量測每個字的實際寬度，與 Figma 的逐字 keyframe 相同 ---- */
+  /* ---- 3 逐字浮現：每個字包成 <span class="ch">，時序與 Figma 的逐字 keyframe 相同。
+         用逐字顯示而非動畫容器寬度，手機版文字才能換行而不被裁掉。 ---- */
   var typeTargets = [
     { el: document.querySelector('.type--name'),    key: 'name' },
     { el: document.querySelector('.type--role'),    key: 'role' },
     { el: document.querySelector('.type--tagline'), key: 'tagline' }
   ].filter(function (t) { return t.el; });
 
-  var typingAnims = [];
+  var charTimer = null;
 
-  function measure(el) {
+  function splitChars(el) {
     var span = el.querySelector('.type__text');
-    var node = span && span.firstChild;
-    if (!node) return null;
-
-    var prev = el.style.width;
-    el.style.width = 'auto';                       /* 量測時先解除裁切 */
-    var range = document.createRange();
-    var base = span.getBoundingClientRect().left;
-    var widths = [0];
-    for (var i = 1; i <= node.length; i++) {
-      range.setStart(node, 0);
-      range.setEnd(node, i);
-      var r = range.getBoundingClientRect();
-      widths.push(Math.ceil(r.right - base) + 1);  /* +1：避免尾字被裁掉半像素 */
+    if (!span || span.dataset.split) return;
+    var text = span.textContent;
+    span.textContent = '';
+    for (var i = 0; i < text.length; i++) {
+      var ch = document.createElement('span');
+      ch.className = 'ch';
+      ch.textContent = text[i];
+      span.appendChild(ch);
     }
-    widths[widths.length - 1] = Math.ceil(span.getBoundingClientRect().width) + 1;
-    el.style.width = prev;
-    return widths;
+    span.dataset.split = '1';
   }
 
-  function playTyping() {
-    typingAnims.forEach(function (a) { a.cancel(); });
-    typingAnims = [];
-    if (!('animate' in Element.prototype)) return;
-
+  function resetChars() {
     typeTargets.forEach(function (t) {
-      var widths = measure(t.el);
-      if (!widths || widths.length < 2) return;
-      var cfg = T.typing[t.key];
-      var n = widths.length - 1;
-      var frames = widths.map(function (w, i) {
-        return { width: w + 'px', offset: i / n, easing: 'steps(1, end)' };
-      });
-      var anim = t.el.animate(frames, {
-        duration: n * cfg.step,
-        delay: cfg.start,
-        fill: 'both',
-        easing: 'linear'
-      });
-      typingAnims.push(anim);
+      splitChars(t.el);
+      var chars = t.el.querySelectorAll('.ch');
+      for (var i = 0; i < chars.length; i++) chars[i].style.visibility = '';
     });
+  }
+
+  function playTyping(startedAt) {
+    if (charTimer) cancelAnimationFrame(charTimer);
+    resetChars();
+
+    var lines = typeTargets.map(function (t) {
+      return { chars: t.el.querySelectorAll('.ch'), cfg: T.typing[t.key], shown: 0 };
+    });
+
+    function tick() {
+      var now = performance.now() - startedAt;
+      var pending = false;
+      for (var i = 0; i < lines.length; i++) {
+        var L = lines[i];
+        var target = Math.floor((now - L.cfg.start) / L.cfg.step) + 1;
+        if (target < 0) target = 0;
+        if (target > L.chars.length) target = L.chars.length;
+        while (L.shown < target) { L.chars[L.shown].style.visibility = 'visible'; L.shown++; }
+        if (L.shown < L.chars.length) pending = true;
+      }
+      if (pending) charTimer = requestAnimationFrame(tick);
+    }
+    charTimer = requestAnimationFrame(tick);
   }
 
   /* ---- 4 播放控制 ---- */
@@ -140,17 +165,17 @@
     root.classList.remove('is-playing');
     void root.offsetWidth;                          /* 強制回流，讓 CSS 動畫重新起跑 */
     root.classList.add('is-playing');
-    playTyping();
-    window.__pfStart = performance.now();   /* 除錯／截圖比對用的時間基準 */
+    window.__pfStart = performance.now();   /* 動畫時間基準（逐字浮現與截圖比對共用） */
+    playTyping(window.__pfStart);
 
     if (loopTimer) clearTimeout(loopTimer);
     if (wantsLoop) loopTimer = setTimeout(play, CYCLE);   /* 與設計稿相同的無限循環 */
   }
 
   function finish() {                               /* 不播動畫：直接停在完成態 */
+    if (charTimer) cancelAnimationFrame(charTimer);
     root.classList.remove('anim', 'is-playing');
-    typingAnims.forEach(function (a) { a.cancel(); });
-    typingAnims = [];
+    resetChars();                                   /* 移除 .anim 後即為全部可見 */
   }
 
   /* ---- 5 啟動 ---- */
@@ -164,7 +189,6 @@
       var playing = root.classList.contains('is-playing');
       buildStripes();
       if (playing) { root.classList.add('is-playing'); }
-      if (typingAnims.length) playTyping();         /* 字寬隨縮放改變，重新量測 */
     }, 180);
   });
 
@@ -177,7 +201,7 @@
     else finish();
   }
 
-  /* 等字型就緒再量測字寬，避免打字中途換字型跳動；最多等 1.5s */
+  /* 等字型就緒再開演，避免打字中途換字型造成跳動；最多等 1.5s */
   if (document.fonts && document.fonts.ready) {
     var started = false;
     var go = function () { if (!started) { started = true; start(); } };
