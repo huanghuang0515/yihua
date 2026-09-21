@@ -201,15 +201,15 @@ body {
       rgba(255, 255, 255, 0) 100%);
 }
 
-/* 海鷗（同一圖形、四種尺寸，與設計稿一致為非等比縮放） */
+/* 海鷗：設計稿匯出的 SVG，位置／尺寸取自 Figma 的 absoluteBoundingBox */
 .bird {
   position: absolute;
-  overflow: visible;
+  display: block;
 }
-.bird--1 { left: calc(50% - 720 * var(--u) + 510 * var(--u));  top: calc(181 * var(--u)); width: calc(149 * var(--u)); height: calc(57 * var(--u)); }
-.bird--2 { left: calc(50% - 720 * var(--u) + 647 * var(--u));  top: calc(146 * var(--u)); width: calc(132 * var(--u)); height: calc(35 * var(--u)); }
-.bird--3 { left: calc(50% - 720 * var(--u) + 824 * var(--u));  top: calc(210 * var(--u)); width: calc(150 * var(--u)); height: calc(76 * var(--u)); }
-.bird--4 { left: calc(50% - 720 * var(--u) + 985 * var(--u));  top: calc(162 * var(--u)); width: calc(116 * var(--u)); height: calc(82 * var(--u)); }
+.bird--1 { left: calc(50% - 720 * var(--u) + 510 * var(--u)); top: calc(181 * var(--u)); width: calc(149 * var(--u)); height: calc(57 * var(--u)); }
+.bird--2 { left: calc(50% - 720 * var(--u) + 647 * var(--u)); top: calc(146 * var(--u)); width: calc(132 * var(--u)); height: calc(35 * var(--u)); }
+.bird--3 { left: calc(50% - 720 * var(--u) + 824 * var(--u)); top: calc(210 * var(--u)); width: calc(150 * var(--u)); height: calc(76 * var(--u)); }
+.bird--4 { left: calc(50% - 720 * var(--u) + 978 * var(--u)); top: calc(164 * var(--u)); width: calc(116 * var(--u)); height: calc(82 * var(--u)); }
 
 /* 打字三行 */
 .type {

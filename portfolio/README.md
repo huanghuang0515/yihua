@@ -33,6 +33,7 @@ node .claude/static-server.js
 portfolio/
   index.html                 版面結構（每個區塊都標了對應的 Figma node id）
   assets/css/portfolio.css   版面與動態；時間常數集中在檔頭註解
+  assets/img/bird-1~4.svg    設計稿匯出的四隻海鷗
   assets/js/portfolio.js     條紋產生、逐字打字、播放控制
 ```
 
@@ -65,13 +66,29 @@ portfolio/
 * **條紋**：間距 15px、寬 7px，三層（天空、沙灘、海面）各自帶垂直漸層；海面層以波浪曲線 `clip-path` 裁切。
 * **互動**：導覽與 logo 具 hover／鍵盤 focus 樣式；`prefers-reduced-motion` 與無 JS 時皆退回完成態（條紋改以「漸層 + 遮罩」靜態呈現）。
 
+### 素材
+
+**海鷗是設計稿本體的 SVG**（`assets/img/bird-1~4.svg`）。此環境的網路政策擋掉了 Figma 素材網域
+（`www.figma.com` CONNECT 403），無法用 URL 下載匯出檔，因此改用 Plugin API
+（`use_figma` → `node.exportAsync({ format: "SVG_STRING" })`）把 SVG 原始碼取回來寫成檔案，
+並以長度與 path 雜湊比對確認與設計稿逐字元一致。四隻是四個不同的圖形，不是同一張圖縮放。
+
+位置與尺寸取自 Figma 的 `absoluteBoundingBox`：
+
+| 檔案 | Figma node | 位置（相對 frame） | 尺寸 |
+| --- | --- | --- | --- |
+| `bird-1.svg` | `3:13597` | 510, 296 | 149 × 57 |
+| `bird-2.svg` | `3:13604` | 647, 261 | 132 × 35 |
+| `bird-3.svg` | `3:13610` | 824, 325 | 150 × 76 |
+| `bird-4.svg` | `3:13601` | 978, 279 | 116 × 82 |
+
+> `bird-4` 在設計稿裡旋轉了 180°，因此 `node.x` 回報的 1094 是旋轉後的原點而非外框左上角；
+> 這裡採用 `absoluteBoundingBox` 的 978，匯出的 SVG 已含旋轉後的外觀，不需要再加 CSS rotate。
+
 ### 已知落差
 
-1. **向量素材為手繪重製**。此環境的網路政策擋掉了 Figma 素材網域（`www.figma.com` CONNECT 403），
-   無法下載設計稿匯出的 SVG，因此**海鷗、logo 橢圓弧線、條紋漸層**是比對設計稿渲染圖後以 SVG／CSS 重畫的。
-   之後若能取得原始匯出檔，只要替換 `index.html` 裡 `<g id="gull">` 的 path 與 logo 的兩條 `<path>` 即可，
-   位置與尺寸都已照設計稿設定好。
-2. **第 4 隻海鷗的 x 座標**以設計稿渲染圖為準（985px），Figma metadata 回報的 1094px 與實際畫面不符。
-3. **導覽列 ABOUT / PROJECT / RESUME 尚無對應頁面**——設計稿目前只有首屏這一頁，因此連結只有 hover 樣式、點擊不跳轉。
-4. **行動版**：設計稿只定義 1440 桌機版，窄螢幕目前是整體等比縮小（不會破版、不會橫向捲動）。
+1. **logo 橢圓弧線與條紋漸層仍是重製的**（比對設計稿渲染圖以 SVG／CSS 重畫）。
+   需要時可用與海鷗相同的方式把原始 SVG 取回替換。
+2. **導覽列 ABOUT / PROJECT / RESUME 尚無對應頁面**——設計稿目前只有首屏這一頁，因此連結只有 hover 樣式、點擊不跳轉。
+3. **行動版**：設計稿只定義 1440 桌機版，窄螢幕目前是整體等比縮小（不會破版、不會橫向捲動）。
    若要真正的手機版面，需要設計稿補上對應的 frame。
