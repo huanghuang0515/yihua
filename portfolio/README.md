@@ -9,14 +9,42 @@
 
 ## 在 localhost 開起來
 
-```bash
-# 專案根目錄（yihua/）
-node .claude/static-server.js
-# → http://localhost:4173/portfolio/
+這個資料夾是**獨立**的：把整個 `portfolio/` 搬到任何位置（例如 `D:\Michelle\Portfolio`）
+都能直接使用，不依賴外層的專案。
+
+**最快：直接開檔案。** 用瀏覽器開啟資料夾裡的 `index.html` 即可（點兩下）。
+`file://` 下所有素材都會正常載入，只有 Google Fonts 需要連線（離線時會退到備用字型）。
+
+**要用伺服器：** 在這個資料夾裡執行
+
+```powershell
+cd D:\Michelle\Portfolio
+node serve.js
+# → http://localhost:4173/
 ```
 
-也可以直接用瀏覽器開啟 `portfolio/index.html`——`file://` 下所有素材都會正常載入，
-只有 Google Fonts 需要連線（離線時會退到備用字型）。
+`serve.js` 以自己所在的資料夾為網站根目錄，所以路徑換了也不用改設定。
+埠號被佔用時換一個：PowerShell `$env:PORT=5173; node serve.js`／bash `PORT=5173 node serve.js`。
+沒裝 Node 也可以用 `python -m http.server 4173`，網址相同。
+
+<details>
+<summary>把檔案放到 D:\Michelle\Portfolio</summary>
+
+```powershell
+# 還沒有 repo：複製分支後把 portfolio 資料夾搬出來
+cd D:\Michelle
+git clone -b claude/trusting-brown-y0lm07 https://github.com/huanghuang0515/yihua.git yihua-tmp
+Move-Item yihua-tmp\portfolio D:\Michelle\Portfolio
+Remove-Item -Recurse -Force yihua-tmp
+
+# 已經有 repo：直接複製資料夾
+Copy-Item -Recurse <repo>\portfolio D:\Michelle\Portfolio
+```
+
+搬出去之後若想單獨做版本控制，在該資料夾 `git init` 即可。
+留在原 repo 裡的話，用根目錄的 `node .claude/static-server.js`
+（→ `http://localhost:4173/portfolio/`）也一樣可以。
+</details>
 
 | 網址參數 | 行為 |
 | --- | --- |
@@ -31,8 +59,9 @@ node .claude/static-server.js
 ## 檔案結構
 
 ```
-portfolio/
+portfolio/                   ← 這層就是網站根目錄，可整包搬到 D:\Michelle\Portfolio
   index.html                 版面結構（每個區塊都標了對應的 Figma node id）
+  serve.js                   本機預覽伺服器（開發輔助，非網站的一部分）
   assets/css/portfolio.css   版面與動態；時間常數集中在檔頭註解
   assets/js/portfolio.js     條紋產生、逐字打字、播放控制
   assets/img/                全部是設計稿匯出的 SVG，沒有手繪重製品
