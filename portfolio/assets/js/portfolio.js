@@ -28,8 +28,12 @@
   /* ---- 1 設計稿單位：--u = 1 個設計稿 px（以 clientWidth 計，避開捲軸誤差） ---- */
   function setUnit() {
     var w = root.clientWidth || window.innerWidth;
-    root.style.setProperty('--u', Math.min(1, w / 1440) + 'px');
-    return Math.min(1, w / 1440);
+    var h = root.clientHeight || window.innerHeight;
+    /* 寬、高都納入：整張 1440x886 一定完整可見，不被裁切也不需捲動。
+       條紋與海面仍以 100% 寬滿版延伸，只有版心內容隨 --u 置中。 */
+    var u = Math.min(1, w / 1440, h / 886);
+    root.style.setProperty('--u', u + 'px');
+    return u;
   }
 
   /* ---- 2 條紋：設計稿每層 95 條，間距 15px；畫面寬於 1440 時往兩側續接 ---- */
