@@ -15,7 +15,8 @@ node .claude/static-server.js
 # → http://localhost:4173/portfolio/
 ```
 
-也可以直接用瀏覽器開啟 `portfolio/index.html`（file:// 亦可運作，只是 Google Fonts 需要連線）。
+也可以直接用瀏覽器開啟 `portfolio/index.html`——`file://` 下所有素材都會正常載入，
+只有 Google Fonts 需要連線（離線時會退到備用字型）。
 
 | 網址參數 | 行為 |
 | --- | --- |
@@ -112,6 +113,8 @@ portfolio/
 2. **條紋兩端**：設計稿的 Frame 1 會把米色條紋裁在 x=14~1424，這裡沒有裁，
    因此最左／最右各多出約 4px 的半條條紋。
 3. **無 JS 時**條紋改用 CSS 漸層近似（有 JS 時是逐條的設計稿 SVG）。
+   海面白色條紋的裁切改用同文件內的 `clipPath`（座標由 `sea.svg` 的波浪路徑換算成 0–1），
+   因為 `mask-image: url(外部 SVG)` 在 `file://` 下會被當成跨來源而失效。
 4. **導覽列 ABOUT / PROJECT / RESUME 尚無對應頁面**——設計稿目前只有首屏這一頁，因此連結只有 hover 樣式、點擊不跳轉。
 5. **行動版**：設計稿只定義 1440 桌機版，窄螢幕目前是整體等比縮小（不會破版、不會橫向捲動）。
    若要真正的手機版面，需要設計稿補上對應的 frame。

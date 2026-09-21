@@ -62,8 +62,8 @@ body {
 .stripe {
   position: absolute;
   top: 0;
-  height: 100%;
   width: calc(8 * var(--u));
+  height: var(--h, 100%);
   left: calc(var(--origin) + (var(--x0) + var(--i) * 15) * var(--u));
   background-image: var(--src);
   background-size: 100% 100%;
@@ -85,16 +85,12 @@ body {
 }
 .stripes--c {                              /* Group 96：白色，疊在海面上 */
   top: 0;
-  height: calc(293 * var(--u));
+  height: 100%;                            /* 與 .sea 同框（300u），裁切座標才對得上 */
+  --h: calc(293 * var(--u));               /* 條紋本身只有 293u 高 */
   --x0: 9;
   --src: url(../img/stripe-c.svg);
-  /* 與設計稿相同，以波浪形狀遮罩（超出波浪的部分不畫） */
-  -webkit-mask-image: url(../img/sea.svg);
-          mask-image: url(../img/sea.svg);
-  -webkit-mask-size: 100% 100%;
-          mask-size: 100% 100%;
-  -webkit-mask-repeat: no-repeat;
-          mask-repeat: no-repeat;
+  /* 與設計稿相同，超出波浪的部分不畫（clipPath 定義在 index.html） */
+  clip-path: url(#waveClip);
 }
 
 /* 無 JS 時的近似退回版本（有 JS 時由 .stripe 元素取代） */
