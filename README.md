@@ -2,6 +2,8 @@
 
 依據設計稿 `首頁 (1).png`（1920 × 5420）復刻的靜態網站，純 HTML + CSS + JavaScript，**無任何建置流程與外部相依**，直接用瀏覽器開啟 `index.html` 即可。
 
+> 作品集首頁（Yi Hua Huang Portfolio）已獨立為 <https://github.com/huanghuang0515/portfolio>。
+
 ---
 
 ## 檔案結構
